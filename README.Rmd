@@ -8,6 +8,7 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
 ```{r}
 # load the data and library
 library(tidyverse)
@@ -15,6 +16,8 @@ library(tidyverse)
 electric_vehicle_population_data <- read_csv("Electric_Vehicle_Population_Data.csv")
 
 head(electric_vehicle_population_data)
+glimpse(electric_vehicle_population_data)
+dim(electric_vehicle_population_data)
 ```
 Topic:
 Differences in electric range across various vehicle makes and models
@@ -28,4 +31,26 @@ electric_vehicle_population_data <- electric_vehicle_population_data %>%
     `Base MSRP` = replace_na(`Base MSRP`, median(`Base MSRP`, na.rm = TRUE))
   )
 
+```
+
+```{r}
+#fixing data types
+electric_vehicle_population_data <- electric_vehicle_population_data |>
+  mutate(
+    `Model Year` = as.integer(`Model Year`),
+    `Postal Code` = as.character(`Postal Code`),
+    `Legislative District` = as.factor(`Legislative District`),
+    State = as.factor(State),
+    `Electric Vehicle Type` = as.factor(`Electric Vehicle Type`),
+    `Clean Alternative Fuel Vehicle (CAFV) Eligibility` =
+      as.factor(`Clean Alternative Fuel Vehicle (CAFV) Eligibility`)
+  )
+
+#remove dupes
+electric_vehicle_population_data <- electric_vehicle_population_data |>
+  distinct(`VIN (1-10)`, `Model Year`, .keep_all = TRUE)
+
+glimpse(electric_vehicle_population_data)
+
+dim(electric_vehicle_population_data)
 ```
