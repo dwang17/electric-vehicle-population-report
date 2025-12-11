@@ -19,5 +19,6 @@ electric_vehicle_population_data <- electric_vehicle_population_data %>%
     electric_range = replace_na(electric_range, median(electric_range, na.rm = TRUE)),
     base_msrp = replace_na(base_msrp, median(base_msrp, na.rm = TRUE))
   )
+##test
 
 ```
