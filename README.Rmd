@@ -23,7 +23,6 @@ Topic:
 Differences in electric range across various vehicle makes and models
 
 How does electric range differ across vehicle makes?
-How does electric range differ across models?
 How does electric range differ across models within the same make?
 Do newer models within the same make tend to have higher range?
 How does electric range differ between BEVs and PHEVs across makes?
@@ -64,6 +63,7 @@ dim(electric_vehicle_population_data)
 
 ```{r}
 library(tidyverse)
+#we filter for vehicles that have electric range > 0 as we only care about electric cars
 ev_plot <- electric_vehicle_population_data |>
   filter(!is.na(`Electric Range`), `Electric Range` > 0)
 
@@ -83,5 +83,28 @@ ev_plot |>
     x = "Make",
     y = "Electric Range (miles)"
   )
+
+```
+
+```{r}
+top_makes <- ev_plot |>
+  count(Make, sort = TRUE) |>
+  slice_head(n = 5) |>
+  pull(Make)
+
+ev_plot |>
+  filter(Make %in% top_makes) |>
+  ggplot(aes(
+    x = `Electric Range`,
+    y = interaction(Make, Model)
+  )) +
+  geom_boxplot() +
+  facet_wrap(~ Make, scales = "free_y") +
+  labs(
+    title = "Electric Range by Model Within Top Vehicle Makes",
+    x = "Electric Range (miles)",
+    y = "Model"
+  )
+
 
 ```
