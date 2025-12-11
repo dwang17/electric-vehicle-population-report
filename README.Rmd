@@ -69,3 +69,19 @@ ev_plot <- electric_vehicle_population_data |>
 
 ```
 
+
+```{r}
+#How does electric range differ across vehicle makes?
+
+ev_plot |>
+  ggplot(aes(x = reorder(Make, `Electric Range`, FUN = median),
+             y = `Electric Range`)) +
+  geom_boxplot() +
+  coord_flip() +
+  labs(
+    title = "Electric Range Distribution by Vehicle Make",
+    x = "Make",
+    y = "Electric Range (miles)"
+  )
+
+```
