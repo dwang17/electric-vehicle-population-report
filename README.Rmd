@@ -8,7 +8,14 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+```{r}
+# load the data and library
+library(tidyverse)
 
+electric_vehicle_population_data <- read_csv("Electric_Vehicle_Population_Data.csv")
+
+head(electric_vehicle_population_data)
+```
 Topic:
 Differences in electric range across various vehicle makes and models
 
@@ -20,6 +27,5 @@ electric_vehicle_population_data <- electric_vehicle_population_data %>%
     `Electric Range` = replace_na(`Electric Range`, median(`Electric Range`, na.rm = TRUE)),
     `Base MSRP` = replace_na(`Base MSRP`, median(`Base MSRP`, na.rm = TRUE))
   )
-
 
 ```
