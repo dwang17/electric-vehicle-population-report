@@ -14,11 +14,11 @@ Differences in electric range across various vehicle makes and models
 
 
 ```{r}
+###cleaning to find median
 electric_vehicle_population_data <- electric_vehicle_population_data %>%
   mutate(
     electric_range = replace_na(electric_range, median(electric_range, na.rm = TRUE)),
     base_msrp = replace_na(base_msrp, median(base_msrp, na.rm = TRUE))
   )
-##test
 
 ```
