@@ -61,3 +61,11 @@ glimpse(electric_vehicle_population_data)
 
 dim(electric_vehicle_population_data)
 ```
+
+```{r}
+library(tidyverse)
+ev_plot <- electric_vehicle_population_data |>
+  filter(!is.na(`Electric Range`), `Electric Range` > 0)
+
+```
+
