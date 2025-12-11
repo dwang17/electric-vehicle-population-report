@@ -21,6 +21,13 @@ dim(electric_vehicle_population_data)
 ```
 Topic:
 Differences in electric range across various vehicle makes and models
+How does electric range differ across vehicle makes?
+How does electric range differ across models?
+How does electric range differ across models within the same make?
+Has the electric range of vehicles increased over time for different makes?
+Do newer models within the same make tend to have higher range?
+How does electric range differ between BEVs and PHEVs across makes?
+Is there a relationship between vehicle price (MSRP) and electric range?
 
 
 ```{r}
