@@ -128,6 +128,22 @@ ev_plot |>
     y = "Model"
   )
 
+ev_plot |>
+  filter(Make %in% top_makes) |>
+  group_by(Make, Model) |>
+  summarise(
+    avg_range = mean(`Electric Range`),
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = avg_range, y = Model)) +
+  geom_point() +
+  facet_wrap(~ Make, scales = "free_y") +
+  labs(
+    title = "Average Electric Range by Model Within Each Make",
+    x = "Average Electric Range (miles)",
+    y = "Model"
+  )
+
 
 ```
 
