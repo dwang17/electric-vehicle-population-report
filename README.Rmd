@@ -19,7 +19,7 @@ head(electric_vehicle_population_data)
 glimpse(electric_vehicle_population_data)
 dim(electric_vehicle_population_data)
 ```
-##Introduction
+## Introduction
 
 Data is from https://catalog.data.gov/dataset/electric-vehicle-population-data 
 
@@ -218,9 +218,11 @@ electric_vehicle_population_data %>%
   ) +
   theme_minimal()
 ```
-1Rural cities show a higher average electric range compared to urban cities in our subset.
--Rural areas averaged about 49 miles, while urban areas averaged around 34 miles.
-1This may suggest that drivers in rural areas tend to own EVs with longer ranges, possibly due to greater travel distances or fewer charging stations 
+
+## Graph Findings
+* Rural cities show a higher average electric range compared to urban cities in our subset.
+* Rural areas averaged about 49 miles, while urban areas averaged around 34 miles.
+* This may suggest that drivers in rural areas tend to own EVs with longer ranges, possibly due to greater travel distances or fewer charging stations 
 while people in more urban areas may not need to 
 travel as far to get to their destination and have 
 access to more charging stations.
@@ -313,8 +315,10 @@ p2 <- ggplot(range_top20,
 p1
 p2
 ```
--Battery Electric Vehicles (BEVs) have a noticeably higher average range than Plug-in Hybrid Electric Vehicles (PHEVs).
--In our dataset, BEVs average around 38 miles of electric range, while PHEVs average closer to 30 miles.
--This aligns with expectations: BEVs rely fully on electric power, so manufacturers maximize their battery capacity, while PHEVs use smaller batteries since they 
+
+## Graph Findings
+* Battery Electric Vehicles (BEVs) have a noticeably higher average range than Plug-in Hybrid Electric Vehicles (PHEVs).
+* In our dataset, BEVs average around 38 miles of electric range, while PHEVs average closer to 30 miles.
+* This aligns with expectations: BEVs rely fully on electric power, so manufacturers maximize their battery capacity, while PHEVs use smaller batteries since they 
 also have gasoline engines.
 

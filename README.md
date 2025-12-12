@@ -81,6 +81,20 @@ dim(electric_vehicle_population_data)
 
     ## [1] 269673     17
 
+## Introduction
+
+Data is from
+<https://catalog.data.gov/dataset/electric-vehicle-population-data>
+
+This dataset shows the Battery Electric Vehicles (BEVs) and Plug-in
+Hybrid Electric Vehicles (PHEVs) that are currently registered through
+Washington State Department of Licensing (DOL). The vehicles can come
+from areas outside of the state. Electric Range is the estimated
+distance a vehicle can travel on a single full charge powered solely by
+its battery before needing to be recharged (we measured by miles) BEVs
+run purely on electricity, PHEVs are plug in hybrid electric vehicles
+that use both gas and electricity
+
 ## Topic: What are the differences in electric range across various vehicle makes, models, and location, along with other potential factors?
 
 We want to know how these factors affect the electric range of a vehicle
@@ -329,14 +343,19 @@ electric_vehicle_population_data %>%
   theme_minimal()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-3.png)<!-- --> 1Rural cities
-show a higher average electric range compared to urban cities in our
-subset. -Rural areas averaged about 49 miles, while urban areas averaged
-around 34 miles. 1This may suggest that drivers in rural areas tend to
-own EVs with longer ranges, possibly due to greater travel distances or
-fewer charging stations while people in more urban areas may not need to
-travel as far to get to their destination and have access to more
-charging stations.
+![](README_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
+
+## Graph Findings
+
+- Rural cities show a higher average electric range compared to urban
+  cities in our subset.
+- Rural areas averaged about 49 miles, while urban areas averaged around
+  34 miles.
+- This may suggest that drivers in rural areas tend to own EVs with
+  longer ranges, possibly due to greater travel distances or fewer
+  charging stations while people in more urban areas may not need to
+  travel as far to get to their destination and have access to more
+  charging stations.
 
 ``` r
 #Do newer models within the same make tend to have higher range?
@@ -437,10 +456,14 @@ p1
 p2
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-9-2.png)<!-- --> -Battery
-Electric Vehicles (BEVs) have a noticeably higher average range than
-Plug-in Hybrid Electric Vehicles (PHEVs). -In our dataset, BEVs average
-around 38 miles of electric range, while PHEVs average closer to 30
-miles. -This aligns with expectations: BEVs rely fully on electric
-power, so manufacturers maximize their battery capacity, while PHEVs use
-smaller batteries since they also have gasoline engines.
+![](README_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
+
+## Graph Findings
+
+- Battery Electric Vehicles (BEVs) have a noticeably higher average
+  range than Plug-in Hybrid Electric Vehicles (PHEVs).
+- In our dataset, BEVs average around 38 miles of electric range, while
+  PHEVs average closer to 30 miles.
+- This aligns with expectations: BEVs rely fully on electric power, so
+  manufacturers maximize their battery capacity, while PHEVs use smaller
+  batteries since they also have gasoline engines.
