@@ -22,7 +22,8 @@ dim(electric_vehicle_population_data)
 
 Topic: Differences in electric range across various vehicle makes,models, and location
 
-How does electric range differ across vehicle makes? How does electric range differ across models within the same make? Do newer models within the same make tend to have higher range? How does electric range differ between BEVs and PHEVs across makes? Do average electric ranges differ across rural and urban cities?
+How does electric range differ across vehicle makes?
+How does electric range differ across models within the same make? Do newer models within the same make tend to have higher range? How does electric range differ between BEVs and PHEVs across makes? Do average electric ranges differ across rural and urban cities?
 
 ```{r}
 ###cleaning to find median
