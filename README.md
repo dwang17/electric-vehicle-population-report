@@ -3,15 +3,10 @@ DS 2020 Final Project Report
 David Wang, Logan Pappas
 2025-11-30
 
-Topic: Differences in electric range across various vehicle makes and
-models
-
 ``` r
-#load the data
+# load the data and library
 library(tidyverse)
 ```
-
-    ## Warning: package 'ggplot2' was built under R version 4.5.2
 
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
     ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
@@ -55,3 +50,397 @@ head(electric_vehicle_population_data)
     ## #   `Electric Range` <dbl>, `Base MSRP` <dbl>, `Legislative District` <dbl>,
     ## #   `DOL Vehicle ID` <dbl>, `Vehicle Location` <chr>, `Electric Utility` <chr>,
     ## #   `2020 Census Tract` <chr>
+
+``` r
+glimpse(electric_vehicle_population_data)
+```
+
+    ## Rows: 269,673
+    ## Columns: 17
+    ## $ `VIN (1-10)`                                        <chr> "3C3CFFGE1G", "WP0…
+    ## $ County                                              <chr> "Yakima", "King", …
+    ## $ City                                                <chr> "Yakima", "Auburn"…
+    ## $ State                                               <chr> "WA", "WA", "WA", …
+    ## $ `Postal Code`                                       <dbl> 98908, 98092, 9810…
+    ## $ `Model Year`                                        <dbl> 2016, 2020, 2018, …
+    ## $ Make                                                <chr> "FIAT", "PORSCHE",…
+    ## $ Model                                               <chr> "500", "TAYCAN", "…
+    ## $ `Electric Vehicle Type`                             <chr> "Battery Electric …
+    ## $ `Clean Alternative Fuel Vehicle (CAFV) Eligibility` <chr> "Clean Alternative…
+    ## $ `Electric Range`                                    <dbl> 84, 203, 215, 291,…
+    ## $ `Base MSRP`                                         <dbl> 0, 0, 0, 0, 0, 0, …
+    ## $ `Legislative District`                              <dbl> 14, 47, 36, 46, 22…
+    ## $ `DOL Vehicle ID`                                    <dbl> 180778377, 2777177…
+    ## $ `Vehicle Location`                                  <chr> "POINT (-120.60199…
+    ## $ `Electric Utility`                                  <chr> "PACIFICORP", "PUG…
+    ## $ `2020 Census Tract`                                 <chr> "53077000401", "53…
+
+``` r
+dim(electric_vehicle_population_data)
+```
+
+    ## [1] 269673     17
+
+## Topic: What are the differences in electric range across various vehicle makes, models, and location, along with other potential factors?
+
+We want to know how these factors affect the electric range of a vehicle
+Our data set includes these variables that we used to solve this
+question: Make, Model, Electric Range, Electric Vehicle Type (BEV or
+PHEV), Model Year, City, County, Base MSRP
+
+## Research Questions
+
+- How does electric range differ across vehicle makes?
+- How does electric range differ across models within the same make?
+- Do newer models within the same make tend to have higher range?
+- How does electric range differ between BEVs and PHEVs across makes?
+- Do average electric ranges differ across rural and urban cities?
+
+``` r
+###cleaning to find median
+electric_vehicle_population_data <- electric_vehicle_population_data %>%
+  mutate(
+    `Electric Range` = replace_na(`Electric Range`, median(`Electric Range`, na.rm = TRUE)),
+    `Base MSRP` = replace_na(`Base MSRP`, median(`Base MSRP`, na.rm = TRUE))
+  )
+```
+
+``` r
+#fixing data types
+electric_vehicle_population_data <- electric_vehicle_population_data |>
+  mutate(
+    `Model Year` = as.integer(`Model Year`),
+    `Postal Code` = as.character(`Postal Code`),
+    `Legislative District` = as.factor(`Legislative District`),
+    State = as.factor(State),
+    `Electric Vehicle Type` = as.factor(`Electric Vehicle Type`),
+    `Clean Alternative Fuel Vehicle (CAFV) Eligibility` =
+      as.factor(`Clean Alternative Fuel Vehicle (CAFV) Eligibility`)
+  )
+
+#remove dupes
+electric_vehicle_population_data <- electric_vehicle_population_data |>
+  distinct(`VIN (1-10)`, `Model Year`, .keep_all = TRUE)
+
+glimpse(electric_vehicle_population_data)
+```
+
+    ## Rows: 16,255
+    ## Columns: 17
+    ## $ `VIN (1-10)`                                        <chr> "3C3CFFGE1G", "WP0…
+    ## $ County                                              <chr> "Yakima", "King", …
+    ## $ City                                                <chr> "Yakima", "Auburn"…
+    ## $ State                                               <fct> WA, WA, WA, WA, WA…
+    ## $ `Postal Code`                                       <chr> "98908", "98092", …
+    ## $ `Model Year`                                        <int> 2016, 2020, 2018, …
+    ## $ Make                                                <chr> "FIAT", "PORSCHE",…
+    ## $ Model                                               <chr> "500", "TAYCAN", "…
+    ## $ `Electric Vehicle Type`                             <fct> Battery Electric V…
+    ## $ `Clean Alternative Fuel Vehicle (CAFV) Eligibility` <fct> Clean Alternative …
+    ## $ `Electric Range`                                    <dbl> 84, 203, 215, 291,…
+    ## $ `Base MSRP`                                         <dbl> 0, 0, 0, 0, 0, 0, …
+    ## $ `Legislative District`                              <fct> 14, 47, 36, 46, 22…
+    ## $ `DOL Vehicle ID`                                    <dbl> 180778377, 2777177…
+    ## $ `Vehicle Location`                                  <chr> "POINT (-120.60199…
+    ## $ `Electric Utility`                                  <chr> "PACIFICORP", "PUG…
+    ## $ `2020 Census Tract`                                 <chr> "53077000401", "53…
+
+``` r
+dim(electric_vehicle_population_data)
+```
+
+    ## [1] 16255    17
+
+## How we Cleaned the Data/First Steps
+
+1.  Removed missing values in key numeric fields- Replaced missing
+    Electric Range and Base MSRP values with the median (most were
+    either 0 or NA)
+
+2.Fixed data types – Converted year, postal code, and categorical fields
+so calculations and grouping work correctly.
+
+3.Removed potential duplicate vehicles – Used VIN + Model Year so that
+each EV appears only once in the dataset.
+
+4.Filtered invalid ranges – Kept only vehicles with electric range
+greater than 0 to focus on real EV performance data.
+
+``` r
+library(tidyverse)
+#we filter for vehicles that have electric range > 0 as we only care about electric cars
+ev_plot <- electric_vehicle_population_data |>
+  filter(!is.na(`Electric Range`), `Electric Range` > 0)
+```
+
+``` r
+#How does electric range differ across vehicle makes?
+
+ev_plot |>
+  ggplot(aes(x = reorder(Make, `Electric Range`, FUN = median),
+             y = `Electric Range`)) +
+  geom_boxplot() +
+  coord_flip() +
+  labs(
+    title = "Electric Range Distribution by Vehicle Make",
+    x = "Make",
+    y = "Electric Range (miles)"
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+ev_plot |>
+  group_by(Make) |>
+  summarise(
+    mean_range = mean(`Electric Range`),
+    sd_range = sd(`Electric Range`),
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = reorder(Make, mean_range), y = mean_range)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(
+    ymin = mean_range - sd_range,
+    ymax = mean_range + sd_range
+  ), width = 0.2) +
+  coord_flip() +
+  labs(
+    title = "Average Electric Range by Make (±1 SD)",
+    x = "Make",
+    y = "Average Electric Range (miles)"
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
+
+``` r
+#How does electric range differ across models within the same make?
+top_makes <- ev_plot |>
+  count(Make, sort = TRUE) |>
+  slice_head(n = 6) |>
+  pull(Make)
+
+ev_plot |>
+  filter(Make %in% top_makes) |>
+  ggplot(aes(
+    x = `Electric Range`,
+    y = interaction(Make, Model)
+  )) +
+  geom_boxplot() +
+  facet_wrap(~ Make, scales = "free_y") +
+  labs(
+    title = "Electric Range by Model Within Top Vehicle Makes",
+    x = "Electric Range (miles)",
+    y = "Model"
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
+ev_plot |>
+  filter(Make %in% top_makes) |>
+  group_by(Make, Model) |>
+  summarise(
+    avg_range = mean(`Electric Range`),
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = avg_range, y = Model)) +
+  geom_point() +
+  facet_wrap(~ Make, scales = "free_y") +
+  labs(
+    title = "Average Electric Range by Model Within Each Make",
+    x = "Average Electric Range (miles)",
+    y = "Model"
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+
+``` r
+#Do average electric ranges differ across rural and urban cities?
+urban_rural_lookup <- tibble(
+  City = c("Seattle", "Tacoma", "Spokane", "Bellevue", "Olympia",
+           "Orondo", "Orondo", "Orting", "Palouse", "Port Hadlock"),
+  Urban_Rural = c("Urban", "Urban", "Urban", "Urban", "Urban",
+                  "Rural", "Rural", "Rural", "Rural", "Rural")
+)
+ev_city_classified <- electric_vehicle_population_data %>%
+  left_join(urban_rural_lookup, by = "City")
+```
+
+    ## Warning in left_join(., urban_rural_lookup, by = "City"): Detected an unexpected many-to-many relationship between `x` and `y`.
+    ## ℹ Row 232 of `x` matches multiple rows in `y`.
+    ## ℹ Row 1 of `y` matches multiple rows in `x`.
+    ## ℹ If a many-to-many relationship is expected, set `relationship =
+    ##   "many-to-many"` to silence this warning.
+
+``` r
+ev_city_classified %>%
+  filter(!is.na(Urban_Rural)) %>%
+  group_by(Urban_Rural) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE)) %>%
+  ggplot(aes(x = Urban_Rural, y = avg_range, fill = Urban_Rural)) +
+  geom_col() +
+  labs(
+    title = "Average Electric Range: Urban vs Rural Cities",
+    x = "City Type",
+    y = "Average Range (miles)"
+  ) +
+  scale_fill_manual(values = c("Urban" = "steelblue", "Rural" = "forestgreen"))
+```
+
+![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+ev_city_classified %>%
+  filter(!is.na(Urban_Rural)) %>%
+  group_by(City, Urban_Rural) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE)) %>%
+  ggplot(aes(x = reorder(City, avg_range), y = avg_range, fill = Urban_Rural)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Average Electric Range of Selected Urban and Rural Cities",
+    x = "City",
+    y = "Average Electric Range"
+  )
+```
+
+    ## `summarise()` has grouped output by 'City'. You can override using the
+    ## `.groups` argument.
+
+![](README_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+``` r
+electric_vehicle_population_data %>%
+  count(County) %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 20) %>%   # top 20 counties
+  ggplot(aes(x = reorder(County, n), y = n)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 20 Counties by Number of Registered EVs",
+    x = "County",
+    y = "Number of EVs"
+  ) +
+  theme_minimal()
+```
+
+![](README_files/figure-gfm/unnamed-chunk-7-3.png)<!-- --> 1Rural cities
+show a higher average electric range compared to urban cities in our
+subset. -Rural areas averaged about 49 miles, while urban areas averaged
+around 34 miles. 1This may suggest that drivers in rural areas tend to
+own EVs with longer ranges, possibly due to greater travel distances or
+fewer charging stations while people in more urban areas may not need to
+travel as far to get to their destination and have access to more
+charging stations.
+
+``` r
+#Do newer models within the same make tend to have higher range?
+
+ev_plot |>
+  filter(Make %in% top_makes) |>
+  group_by(Make, `Model Year`) |>
+  summarise(
+    avg_range = mean(`Electric Range`),
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = `Model Year`, y = avg_range, color = Make)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Average Electric Range Over Time by Make",
+    x = "Model Year",
+    y = "Average Electric Range (miles)"
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+#How does electric range differ between BEVs and PHEVs across makes?
+ev2 <- electric_vehicle_population_data %>%
+  mutate(EV_Type = case_when(
+    `Electric Vehicle Type` == "Battery Electric Vehicle (BEV)" ~ "BEV",
+    `Electric Vehicle Type` == "Plug-in Hybrid Electric Vehicle (PHEV)" ~ "PHEV",
+    TRUE ~ NA_character_
+  ))
+
+avg_range_by_type <- ev2 %>%
+  filter(!is.na(EV_Type)) %>%
+  group_by(EV_Type) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE))
+
+p1 <- ggplot(avg_range_by_type,
+             aes(x = EV_Type, y = avg_range, fill = EV_Type)) +
+  geom_col() +
+  scale_fill_manual(values = c("BEV" = "steelblue", "PHEV" = "darkorange")) +
+  labs(
+    title = "Average Electric Range: BEVs vs PHEVs",
+    x = "Vehicle Type",
+    y = "Average Electric Range (miles)"
+  ) +
+  theme_minimal()
+
+top10_BEV <- ev2 %>%
+  filter(EV_Type == "BEV") %>%
+  count(Make, sort = TRUE) %>%
+  slice_head(n = 10) %>%
+  pull(Make)
+
+top10_PHEV <- ev2 %>%
+  filter(EV_Type == "PHEV") %>%
+  count(Make, sort = TRUE) %>%
+  slice_head(n = 10) %>%
+  pull(Make)
+
+range_top20 <- ev2 %>%
+  filter(
+    (EV_Type == "BEV" & Make %in% top10_BEV) |
+    (EV_Type == "PHEV" & Make %in% top10_PHEV)
+  ) %>%
+  group_by(Make, EV_Type) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE)) %>%
+  ungroup()
+```
+
+    ## `summarise()` has grouped output by 'Make'. You can override using the
+    ## `.groups` argument.
+
+``` r
+unique_levels <- unique(c(top10_BEV, top10_PHEV))
+
+range_top20$Make <- factor(range_top20$Make, levels = unique_levels)
+
+p2 <- ggplot(range_top20,
+             aes(x = Make, y = avg_range, fill = EV_Type)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "Top 10 BEV vs Top 10 PHEV Makes — Average Electric Range",
+    x = "Vehicle Make",
+    y = "Average Electric Range (miles)",
+    fill = "EV Type"
+  ) +
+  scale_fill_manual(values = c("BEV" = "steelblue", "PHEV" = "darkorange")) +
+  theme_minimal()
+
+p1
+```
+
+![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+``` r
+p2
+```
+
+![](README_files/figure-gfm/unnamed-chunk-9-2.png)<!-- --> -Battery
+Electric Vehicles (BEVs) have a noticeably higher average range than
+Plug-in Hybrid Electric Vehicles (PHEVs). -In our dataset, BEVs average
+around 38 miles of electric range, while PHEVs average closer to 30
+miles. -This aligns with expectations: BEVs rely fully on electric
+power, so manufacturers maximize their battery capacity, while PHEVs use
+smaller batteries since they also have gasoline engines.
