@@ -8,6 +8,8 @@ David Wang, Logan Pappas
 library(tidyverse)
 ```
 
+    ## Warning: package 'ggplot2' was built under R version 4.5.2
+
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
     ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
     ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
@@ -228,6 +230,21 @@ ev_plot |>
 
 ![](README_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
 
+## Graph Findings
+
+- Electric range varies based on manufacturers, makes like Tesla,
+  Volkswagen, Nissan have higher electric range
+
+- In the same make, electric range can range quite a bit, with Audi and
+  Hyundai have wide varying electric range
+
+- These results suggest that electric range depends not just on
+  manufacturer, but also on specific models and vehicle type.
+
+- Because of outliers and uneven distributions of how models are
+  offered, comparisons between manufacturers should be interpreted
+  cautiously.
+
 ``` r
 #How does electric range differ across models within the same make?
 top_makes <- ev_plot |>
@@ -271,6 +288,21 @@ ev_plot |>
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+
+## Graph Findings
+
+- Electric range can vary a lot across models with the same
+  manufacturer, showing that not all models that have the same make
+  perform similarly.
+
+- Manufacturers like Tesla and Chevrolet, show clear electric range
+  differences between models.
+
+- Other makes, like Audi, BMW, and Volvo, tend to be at low electric
+  ranges, maybe due to being plug-in hybrids or shorter-range models.
+
+- A lot of makes have certain models that stand out as high-range
+  outliers, which can disproportionately influence overall summaries.
 
 ``` r
 #Do average electric ranges differ across rural and urban cities?
@@ -378,6 +410,18 @@ ev_plot |>
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+## Graph Findings
+
+- Average electric range tends to increase over time for most
+  manufacturers, which reflects improvements in battery technology.
+
+- Tesla consistently shows higher average ranges than other makes, while
+  makes with sharp increases can be due to the company investing more
+  into creating electric vehicles
+
+- Overall, trends vary widely across manufacturers, so year-to-year
+  changes should be interpreted cautiously.
 
 ``` r
 #How does electric range differ between BEVs and PHEVs across makes?
