@@ -84,6 +84,27 @@ ev_plot |>
     y = "Electric Range (miles)"
   )
 
+ev_plot |>
+  group_by(Make) |>
+  summarise(
+    mean_range = mean(`Electric Range`),
+    sd_range = sd(`Electric Range`),
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = reorder(Make, mean_range), y = mean_range)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(
+    ymin = mean_range - sd_range,
+    ymax = mean_range + sd_range
+  ), width = 0.2) +
+  coord_flip() +
+  labs(
+    title = "Average Electric Range by Make (±1 SD)",
+    x = "Make",
+    y = "Average Electric Range (miles)"
+  )
+
+
 ```
 
 ```{r}
