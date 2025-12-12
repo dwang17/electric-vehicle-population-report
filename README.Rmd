@@ -89,7 +89,7 @@ ev_plot |>
 ```{r}
 top_makes <- ev_plot |>
   count(Make, sort = TRUE) |>
-  slice_head(n = 5) |>
+  slice_head(n = 6) |>
   pull(Make)
 
 ev_plot |>
@@ -144,4 +144,24 @@ ev_city_classified %>%
     x = "City",
     y = "Average Electric Range"
   )
+```
+```{r}
+#Do newer models within the same make tend to have higher range?
+
+ev_plot |>
+  filter(Make %in% top_makes) |>
+  group_by(Make, `Model Year`) |>
+  summarise(
+    avg_range = mean(`Electric Range`),
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = `Model Year`, y = avg_range, color = Make)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Average Electric Range Over Time by Make",
+    x = "Model Year",
+    y = "Average Electric Range (miles)"
+  )
+
 ```
