@@ -20,13 +20,13 @@ glimpse(electric_vehicle_population_data)
 dim(electric_vehicle_population_data)
 ```
 Topic:
-Differences in electric range across various vehicle makes and models
+Differences in electric range across various vehicle makes,models, and range
 
 How does electric range differ across vehicle makes?
 How does electric range differ across models within the same make?
 Do newer models within the same make tend to have higher range?
 How does electric range differ between BEVs and PHEVs across makes?
-Do average electric ranges differ across cities?
+Do average electric ranges differ across rural and urban cities?
 
 
 ```{r}
@@ -107,4 +107,41 @@ ev_plot |>
   )
 
 
+```
+
+```{r}
+urban_rural_lookup <- tibble(
+  City = c("Seattle", "Tacoma", "Spokane", "Bellevue", "Olympia",
+           "Orondo", "Orondo", "Orting", "Palouse", "Port Hadlock"),
+  Urban_Rural = c("Urban", "Urban", "Urban", "Urban", "Urban",
+                  "Rural", "Rural", "Rural", "Rural", "Rural")
+)
+ev_city_classified <- electric_vehicle_population_data %>%
+  left_join(urban_rural_lookup, by = "City")
+
+ev_city_classified %>%
+  filter(!is.na(Urban_Rural)) %>%
+  group_by(Urban_Rural) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE)) %>%
+  ggplot(aes(x = Urban_Rural, y = avg_range, fill = Urban_Rural)) +
+  geom_col() +
+  labs(
+    title = "Average Electric Range: Urban vs Rural Cities",
+    x = "City Type",
+    y = "Average Range (miles)"
+  ) +
+  scale_fill_manual(values = c("Urban" = "steelblue", "Rural" = "forestgreen"))
+
+ev_city_classified %>%
+  filter(!is.na(Urban_Rural)) %>%
+  group_by(City, Urban_Rural) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE)) %>%
+  ggplot(aes(x = reorder(City, avg_range), y = avg_range, fill = Urban_Rural)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Average Electric Range of Selected Urban and Rural Cities",
+    x = "City",
+    y = "Average Electric Range"
+  )
 ```
