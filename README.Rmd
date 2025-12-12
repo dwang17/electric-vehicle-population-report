@@ -167,6 +167,19 @@ ev_city_classified %>%
     x = "City",
     y = "Average Electric Range"
   )
+electric_vehicle_population_data %>%
+  count(County) %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 20) %>%   # top 20 counties
+  ggplot(aes(x = reorder(County, n), y = n)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Top 20 Counties by Number of Registered EVs",
+    x = "County",
+    y = "Number of EVs"
+  ) +
+  theme_minimal()
 ```
 ```{r}
 #Do newer models within the same make tend to have higher range?
@@ -191,7 +204,7 @@ ev_plot |>
 
 
 ```{r}
-#Do average electric ranges differ across rural and urban cities?
+#How does electric range differ between BEVs and PHEVs across makes?
 ev2 <- electric_vehicle_population_data %>%
   mutate(EV_Type = case_when(
     `Electric Vehicle Type` == "Battery Electric Vehicle (BEV)" ~ "BEV",
