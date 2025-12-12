@@ -20,7 +20,7 @@ glimpse(electric_vehicle_population_data)
 dim(electric_vehicle_population_data)
 ```
 Topic:
-Differences in electric range across various vehicle makes,models, and location
+What are the differences in electric range across various vehicle makes, models, and location, along with other potential factors?
 
 How does electric range differ across vehicle makes?
 How does electric range differ across models within the same make?
