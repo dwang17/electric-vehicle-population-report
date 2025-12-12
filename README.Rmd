@@ -353,3 +353,27 @@ p2
 * This aligns with expectations: BEVs rely fully on electric power, so manufacturers maximize their battery capacity, while PHEVs use smaller batteries since they 
 also have gasoline engines.
 
+## Shortcomings/Outliers
+* The MSRP variable had almost no data making it hard to connect any variables to price
+* Tesla often threw averages off having a much higher range than any other brand
+* Having many models and cities in the data set, we often had to restructure our graphs to make it readable
+* Only showing top models isn’t necessarily representative of all the models present
+* The dataset we chose is only for registered cars in Washington so it isn’t a good representation of all cars in the US
+
+## Conclusion
+Overall, electric range varies significantly by make, model, vehicle type, and location. We found that
+
+* The make influences the range
+* Models from the same make influences the range
+* The average range for each model tends to increase over time
+* BEVs have a higher average range than PHEV’s
+* Rural cities show higher average range than Urban cities
+
+## Further Questions and Research
+* How does the price affect the range?
+* How could charging station availability affect the range?
+* Could weather or temperature affect the range?
+* How do these cars compare to gas powered cars?
+* What areas/counties have the most electric vehicles?
+
+
