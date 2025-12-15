@@ -702,26 +702,20 @@ ggplot(avg_range_no_tesla,
 
 ``` r
 # Show original graphs
-p1
 ```
-
-![](README_files/figure-gfm/unnamed-chunk-9-4.png)<!-- -->
-
-``` r
-p2
-```
-
-![](README_files/figure-gfm/unnamed-chunk-9-5.png)<!-- -->
 
 ## Graph Findings
 
 - Battery Electric Vehicles (BEVs) have a noticeably higher average
-  range than Plug-in Hybrid Electric Vehicles (PHEVs).
+  range than Plug-in Hybrid Electric Vehicles (PHEVs). When we remove
+  the unfair advantage, tesla, we get that PHEV actually has a higher
+  average range.
 - In our dataset, BEVs average around 38 miles of electric range, while
-  PHEVs average closer to 30 miles.
-- This aligns with expectations: BEVs rely fully on electric power, so
-  manufacturers maximize their battery capacity, while PHEVs use smaller
-  batteries since they also have gasoline engines.
+  PHEVs average closer to 30 miles. Without Tesla BEV is about 25 miles
+  while PHEV is still 30.
+- This aligns with expectations: Tesla dominates high quality BEV car
+  market so taking them out shows a more fair comparison between the
+  two.
 
 ## Shortcomings/Outliers
 
