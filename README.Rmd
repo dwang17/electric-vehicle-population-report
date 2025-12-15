@@ -125,14 +125,104 @@ ev_plot |>
     y = "Average Electric Range (miles)"
   )
 
+#filter top 15 median electric range vehicles
+
+top_15_makes <- ev_plot |>
+  group_by(Make) |>
+  summarise(
+    median_range = median(`Electric Range`),
+    .groups = "drop"
+  ) |>
+  arrange(desc(median_range)) |>
+  slice_head(n = 15) |>
+  pull(Make)
+
+ev_plot |>
+  filter(Make %in% top_15_makes) |>
+  ggplot(aes(
+    x = reorder(Make, `Electric Range`, FUN = median),
+    y = `Electric Range`
+  )) +
+  geom_boxplot() +
+  coord_flip() +
+  labs(
+    title = "Top 15 Vehicle Makes by Median Electric Range",
+    x = "Make",
+    y = "Electric Range (miles)"
+  )
+
+ev_plot |>
+  filter(Make %in% top_15_makes) |>
+  group_by(Make) |>
+  summarise(
+    mean_range = mean(`Electric Range`),
+    sd_range = sd(`Electric Range`),
+    .groups = "drop"
+  ) |>
+  ggplot(aes(
+    x = reorder(Make, mean_range),
+    y = mean_range
+  )) +
+  geom_point(size = 2) +
+  geom_errorbar(
+    aes(
+      ymin = mean_range - sd_range,
+      ymax = mean_range + sd_range
+    ),
+    width = 0.2
+  ) +
+  coord_flip() +
+  labs(
+    title = "Top 15 Vehicle Makes by Average Electric Range (±1 SD)",
+    x = "Make",
+    y = "Average Electric Range (miles)"
+  )
+
+
+#decided to just leave in popular makes, which tend to have the highest variablility + to make graph bigger and more visible
+
+# identify the top 15 vehicle makes by IQR (boxplot spread)
+top_15_iqr_makes <- ev_plot |>
+  group_by(Make) |>
+  summarise(
+    q1 = quantile(`Electric Range`, 0.25),
+    q3 = quantile(`Electric Range`, 0.75),
+    iqr = q3 - q1,
+    .groups = "drop"
+  ) |>
+  arrange(desc(iqr)) |>
+  slice_head(n = 15) |>
+  pull(Make)
+
+# boxplot for these top 15 makes by IQR
+ev_plot |>
+  filter(Make %in% top_15_iqr_makes) |>
+  ggplot(aes(
+    x = reorder(
+      Make,
+      `Electric Range`,
+      FUN = function(x) quantile(x, 0.75) - quantile(x, 0.25)
+    ),
+    y = `Electric Range`
+  )) +
+  geom_boxplot() +
+  coord_flip() +
+  labs(
+    title = "Vehicle Makes with the Largest Electric Range Variability",
+    x = "Make",
+    y = "Electric Range (miles)"
+  )
+
 
 ```
 
-## Graph Findings
+## Graph Findings (based off Vehicle Makes with Largest Electric Range Variability)
 
-* Electric range varies based on manufacturers, makes like Tesla, Volkswagen, Nissan have higher electric range
+* Filtered down to makes that have the highest variability, which also tend to be in more popular makes
 
-* In the same make, electric range can range quite a bit, with Audi and Hyundai have wide varying electric range
+* Electric range varies based on manufacturers, makes like Tesla, Volkswagen, Nissan have higher median electric range
+
+* In the same make, electric range can range quite a bit, with Audi and Hyundai have the widest range of  electric range
 
 * These results suggest that electric range depends not just on manufacturer, but also on specific models and vehicle type.
 
