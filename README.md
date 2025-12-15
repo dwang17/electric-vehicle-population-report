@@ -220,7 +220,7 @@ ev_plot |>
   ), width = 0.2) +
   coord_flip() +
   labs(
-    title = "Average Electric Range by Make (±1 SD)",
+    title = "Average Electric Range by Make (+1/-1 SD)",
     x = "Make",
     y = "Average Electric Range (miles)"
   )
@@ -281,7 +281,7 @@ ev_plot |>
   ) +
   coord_flip() +
   labs(
-    title = "Top 15 Vehicle Makes by Average Electric Range (±1 SD)",
+    title = "Top 15 Vehicle Makes by Average Electric Range +1/-1 SD)",
     x = "Make",
     y = "Average Electric Range (miles)"
   )
