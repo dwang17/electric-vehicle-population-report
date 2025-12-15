@@ -289,6 +289,7 @@ ev2 <- electric_vehicle_population_data %>%
     TRUE ~ NA_character_
   ))
 
+
 avg_range_by_type <- ev2 %>%
   filter(!is.na(EV_Type)) %>%
   group_by(EV_Type) %>%
@@ -343,6 +344,93 @@ p2 <- ggplot(range_top20,
   scale_fill_manual(values = c("BEV" = "steelblue", "PHEV" = "darkorange")) +
   theme_minimal()
 
+p1
+p2
+ev2 <- electric_vehicle_population_data %>%
+  mutate(EV_Type = case_when(
+    `Electric Vehicle Type` == "Battery Electric Vehicle (BEV)" ~ "BEV",
+    `Electric Vehicle Type` == "Plug-in Hybrid Electric Vehicle (PHEV)" ~ "PHEV",
+    TRUE ~ NA_character_
+  ))
+
+# NEW LINE: remove Tesla for the fair comparison
+ev_no_tesla <- ev2 %>% filter(Make != "TESLA")
+
+# ---- Original BEV vs PHEV graph (WITH Tesla) ----
+avg_range_by_type <- ev2 %>%
+  filter(!is.na(EV_Type)) %>%
+  group_by(EV_Type) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE))
+
+p1 <- ggplot(avg_range_by_type,
+             aes(x = EV_Type, y = avg_range, fill = EV_Type)) +
+  geom_col() +
+  scale_fill_manual(values = c("BEV" = "steelblue", "PHEV" = "darkorange")) +
+  labs(
+    title = "Average Electric Range: BEVs vs PHEVs",
+    x = "Vehicle Type",
+    y = "Average Electric Range (miles)"
+  ) +
+  theme_minimal()
+
+
+# ---- Original top 10 BEV / PHEV makes (WITH Tesla) ----
+top10_BEV <- ev2 %>%
+  filter(EV_Type == "BEV") %>%
+  count(Make, sort = TRUE) %>%
+  slice_head(n = 10) %>%
+  pull(Make)
+
+top10_PHEV <- ev2 %>%
+  filter(EV_Type == "PHEV") %>%
+  count(Make, sort = TRUE) %>%
+  slice_head(n = 10) %>%
+  pull(Make)
+
+range_top20 <- ev2 %>%
+  filter(
+    (EV_Type == "BEV" & Make %in% top10_BEV) |
+    (EV_Type == "PHEV" & Make %in% top10_PHEV)
+  ) %>%
+  group_by(Make, EV_Type) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE)) %>%
+  ungroup()
+
+unique_levels <- unique(c(top10_BEV, top10_PHEV))
+
+range_top20$Make <- factor(range_top20$Make, levels = unique_levels)
+
+p2 <- ggplot(range_top20,
+             aes(x = Make, y = avg_range, fill = EV_Type)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "Top 10 BEV vs Top 10 PHEV Makes — Average Electric Range",
+    x = "Vehicle Make",
+    y = "Average Electric Range (miles)",
+    fill = "EV Type"
+  ) +
+  scale_fill_manual(values = c("BEV" = "steelblue", "PHEV" = "darkorange")) +
+  theme_minimal()
+
+
+# ---- NEW GRAPH: BEVs vs PHEVs with Tesla REMOVED ----
+avg_range_no_tesla <- ev_no_tesla %>%
+  group_by(EV_Type) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE))
+
+ggplot(avg_range_no_tesla,
+       aes(x = EV_Type, y = avg_range, fill = EV_Type)) +
+  geom_col() +
+  scale_fill_manual(values = c("BEV" = "steelblue", "PHEV" = "darkorange")) +
+  labs(
+    title = "Average Electric Range: BEVs vs PHEVs (Tesla Removed)",
+    x = "Vehicle Type",
+    y = "Average Electric Range (miles)"
+  ) +
+  theme_minimal()
+
+# Show original graphs
 p1
 p2
 ```
