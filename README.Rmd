@@ -90,9 +90,9 @@ ev_plot <- electric_vehicle_population_data |>
   filter(!is.na(`Electric Range`), `Electric Range` > 0)
 
 ```
-
+## How does electric range differ across vehicle makes?
 ```{r}
-#How does electric range differ across vehicle makes?
+
 
 ev_plot |>
   ggplot(aes(x = reorder(Make, `Electric Range`, FUN = median),
@@ -228,9 +228,10 @@ ev_plot |>
 
 * Because of outliers and uneven distributions of how models are offered, comparisons between manufacturers should be interpreted cautiously.
 
+## How does electric range differ across models within the same make?
 
 ```{r}
-#How does electric range differ across models within the same make?
+
 top_makes <- ev_plot |>
   count(Make, sort = TRUE) |>
   slice_head(n = 6) |>
@@ -279,7 +280,7 @@ ev_plot |>
 
 * A lot of makes have certain models that stand out as high-range outliers, which can disproportionately influence overall summaries.
 
-
+## Do average electric ranges differ across rural and urban cities?
 ```{r}
 #Do average electric ranges differ across rural and urban cities?
 urban_rural_lookup <- tibble(
@@ -339,9 +340,9 @@ while people in more urban areas may not need to
 travel as far to get to their destination and have 
 access to more charging stations.
 
-
+## Do newer models within the same make tend to have higher range?
 ```{r}
-#Do newer models within the same make tend to have higher range?
+
 
 ev_plot |>
   filter(Make %in% top_makes) |>
@@ -369,9 +370,9 @@ ev_plot |>
 
 * Overall, trends vary widely across manufacturers, so year-to-year changes should be interpreted cautiously.
 
-
+## How does electric range differ between BEVs and PHEVs across makes?
 ```{r}
-#How does electric range differ between BEVs and PHEVs across makes?
+
 ev2 <- electric_vehicle_population_data %>%
   mutate(EV_Type = case_when(
     `Electric Vehicle Type` == "Battery Electric Vehicle (BEV)" ~ "BEV",
@@ -443,10 +444,10 @@ ev2 <- electric_vehicle_population_data %>%
     TRUE ~ NA_character_
   ))
 
-# NEW LINE: remove Tesla for the fair comparison
+
 ev_no_tesla <- ev2 %>% filter(Make != "TESLA")
 
-# ---- Original BEV vs PHEV graph (WITH Tesla) ----
+# BEV vs PHEV with Tesla
 avg_range_by_type <- ev2 %>%
   filter(!is.na(EV_Type)) %>%
   group_by(EV_Type) %>%
@@ -464,7 +465,7 @@ p1 <- ggplot(avg_range_by_type,
   theme_minimal()
 
 
-# ---- Original top 10 BEV / PHEV makes (WITH Tesla) ----
+# Top 10 BEV vs PHEV
 top10_BEV <- ev2 %>%
   filter(EV_Type == "BEV") %>%
   count(Make, sort = TRUE) %>%
@@ -504,7 +505,7 @@ p2 <- ggplot(range_top20,
   theme_minimal()
 
 
-# ---- NEW GRAPH: BEVs vs PHEVs with Tesla REMOVED ----
+# Tesla removed graph
 avg_range_no_tesla <- ev_no_tesla %>%
   group_by(EV_Type) %>%
   summarise(avg_range = mean(`Electric Range`, na.rm = TRUE))

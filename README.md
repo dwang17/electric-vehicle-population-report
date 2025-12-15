@@ -187,9 +187,9 @@ ev_plot <- electric_vehicle_population_data |>
   filter(!is.na(`Electric Range`), `Electric Range` > 0)
 ```
 
-``` r
-#How does electric range differ across vehicle makes?
+## How does electric range differ across vehicle makes?
 
+``` r
 ev_plot |>
   ggplot(aes(x = reorder(Make, `Electric Range`, FUN = median),
              y = `Electric Range`)) +
@@ -228,13 +228,115 @@ ev_plot |>
 
 ![](README_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
 
-## Graph Findings
+``` r
+#filter top 15 median electric range vehicles
+
+top_15_makes <- ev_plot |>
+  group_by(Make) |>
+  summarise(
+    median_range = median(`Electric Range`),
+    .groups = "drop"
+  ) |>
+  arrange(desc(median_range)) |>
+  slice_head(n = 15) |>
+  pull(Make)
+
+ev_plot |>
+  filter(Make %in% top_15_makes) |>
+  ggplot(aes(
+    x = reorder(Make, `Electric Range`, FUN = median),
+    y = `Electric Range`
+  )) +
+  geom_boxplot() +
+  coord_flip() +
+  labs(
+    title = "Top 15 Vehicle Makes by Median Electric Range",
+    x = "Make",
+    y = "Electric Range (miles)"
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-5-3.png)<!-- -->
+
+``` r
+ev_plot |>
+  filter(Make %in% top_15_makes) |>
+  group_by(Make) |>
+  summarise(
+    mean_range = mean(`Electric Range`),
+    sd_range = sd(`Electric Range`),
+    .groups = "drop"
+  ) |>
+  ggplot(aes(
+    x = reorder(Make, mean_range),
+    y = mean_range
+  )) +
+  geom_point(size = 2) +
+  geom_errorbar(
+    aes(
+      ymin = mean_range - sd_range,
+      ymax = mean_range + sd_range
+    ),
+    width = 0.2
+  ) +
+  coord_flip() +
+  labs(
+    title = "Top 15 Vehicle Makes by Average Electric Range (±1 SD)",
+    x = "Make",
+    y = "Average Electric Range (miles)"
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-5-4.png)<!-- -->
+
+``` r
+#decided to just leave in popular makes, which tend to have the highest variablility + to make graph bigger and more visible
+
+# identify the top 15 vehicle makes by IQR (boxplot spread)
+top_15_iqr_makes <- ev_plot |>
+  group_by(Make) |>
+  summarise(
+    q1 = quantile(`Electric Range`, 0.25),
+    q3 = quantile(`Electric Range`, 0.75),
+    iqr = q3 - q1,
+    .groups = "drop"
+  ) |>
+  arrange(desc(iqr)) |>
+  slice_head(n = 15) |>
+  pull(Make)
+
+# boxplot for these top 15 makes by IQR
+ev_plot |>
+  filter(Make %in% top_15_iqr_makes) |>
+  ggplot(aes(
+    x = reorder(
+      Make,
+      `Electric Range`,
+      FUN = function(x) quantile(x, 0.75) - quantile(x, 0.25)
+    ),
+    y = `Electric Range`
+  )) +
+  geom_boxplot() +
+  coord_flip() +
+  labs(
+    title = "Vehicle Makes with the Largest Electric Range Variability",
+    x = "Make",
+    y = "Electric Range (miles)"
+  )
+```
+
+![](README_files/figure-gfm/unnamed-chunk-5-5.png)<!-- -->
+
+## Graph Findings (based off Vehicle Makes with Largest Electric Range Variability)
+
+- Filtered down to makes that have the highest variability, which also
+  tend to be in more popular makes
 
 - Electric range varies based on manufacturers, makes like Tesla,
-  Volkswagen, Nissan have higher electric range
+  Volkswagen, Nissan have higher median electric range
 
 - In the same make, electric range can range quite a bit, with Audi and
-  Hyundai have wide varying electric range
+  Hyundai have the widest range of electric range
 
 - These results suggest that electric range depends not just on
   manufacturer, but also on specific models and vehicle type.
@@ -243,8 +345,9 @@ ev_plot |>
   offered, comparisons between manufacturers should be interpreted
   cautiously.
 
+## How does electric range differ across models within the same make?
+
 ``` r
-#How does electric range differ across models within the same make?
 top_makes <- ev_plot |>
   count(Make, sort = TRUE) |>
   slice_head(n = 6) |>
@@ -301,6 +404,8 @@ ev_plot |>
 
 - A lot of makes have certain models that stand out as high-range
   outliers, which can disproportionately influence overall summaries.
+
+## Do average electric ranges differ across rural and urban cities?
 
 ``` r
 #Do average electric ranges differ across rural and urban cities?
@@ -387,9 +492,9 @@ electric_vehicle_population_data %>%
   travel as far to get to their destination and have access to more
   charging stations.
 
-``` r
-#Do newer models within the same make tend to have higher range?
+## Do newer models within the same make tend to have higher range?
 
+``` r
 ev_plot |>
   filter(Make %in% top_makes) |>
   group_by(Make, `Model Year`) |>
@@ -421,14 +526,16 @@ ev_plot |>
 - Overall, trends vary widely across manufacturers, so year-to-year
   changes should be interpreted cautiously.
 
+## How does electric range differ between BEVs and PHEVs across makes?
+
 ``` r
-#How does electric range differ between BEVs and PHEVs across makes?
 ev2 <- electric_vehicle_population_data %>%
   mutate(EV_Type = case_when(
     `Electric Vehicle Type` == "Battery Electric Vehicle (BEV)" ~ "BEV",
     `Electric Vehicle Type` == "Plug-in Hybrid Electric Vehicle (PHEV)" ~ "PHEV",
     TRUE ~ NA_character_
   ))
+
 
 avg_range_by_type <- ev2 %>%
   filter(!is.na(EV_Type)) %>%
@@ -499,6 +606,112 @@ p2
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
+
+``` r
+ev2 <- electric_vehicle_population_data %>%
+  mutate(EV_Type = case_when(
+    `Electric Vehicle Type` == "Battery Electric Vehicle (BEV)" ~ "BEV",
+    `Electric Vehicle Type` == "Plug-in Hybrid Electric Vehicle (PHEV)" ~ "PHEV",
+    TRUE ~ NA_character_
+  ))
+
+
+ev_no_tesla <- ev2 %>% filter(Make != "TESLA")
+
+# BEV vs PHEV with Tesla
+avg_range_by_type <- ev2 %>%
+  filter(!is.na(EV_Type)) %>%
+  group_by(EV_Type) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE))
+
+p1 <- ggplot(avg_range_by_type,
+             aes(x = EV_Type, y = avg_range, fill = EV_Type)) +
+  geom_col() +
+  scale_fill_manual(values = c("BEV" = "steelblue", "PHEV" = "darkorange")) +
+  labs(
+    title = "Average Electric Range: BEVs vs PHEVs",
+    x = "Vehicle Type",
+    y = "Average Electric Range (miles)"
+  ) +
+  theme_minimal()
+
+
+# Top 10 BEV vs PHEV
+top10_BEV <- ev2 %>%
+  filter(EV_Type == "BEV") %>%
+  count(Make, sort = TRUE) %>%
+  slice_head(n = 10) %>%
+  pull(Make)
+
+top10_PHEV <- ev2 %>%
+  filter(EV_Type == "PHEV") %>%
+  count(Make, sort = TRUE) %>%
+  slice_head(n = 10) %>%
+  pull(Make)
+
+range_top20 <- ev2 %>%
+  filter(
+    (EV_Type == "BEV" & Make %in% top10_BEV) |
+    (EV_Type == "PHEV" & Make %in% top10_PHEV)
+  ) %>%
+  group_by(Make, EV_Type) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE)) %>%
+  ungroup()
+```
+
+    ## `summarise()` has grouped output by 'Make'. You can override using the
+    ## `.groups` argument.
+
+``` r
+unique_levels <- unique(c(top10_BEV, top10_PHEV))
+
+range_top20$Make <- factor(range_top20$Make, levels = unique_levels)
+
+p2 <- ggplot(range_top20,
+             aes(x = Make, y = avg_range, fill = EV_Type)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "Top 10 BEV vs Top 10 PHEV Makes — Average Electric Range",
+    x = "Vehicle Make",
+    y = "Average Electric Range (miles)",
+    fill = "EV Type"
+  ) +
+  scale_fill_manual(values = c("BEV" = "steelblue", "PHEV" = "darkorange")) +
+  theme_minimal()
+
+
+# Tesla removed graph
+avg_range_no_tesla <- ev_no_tesla %>%
+  group_by(EV_Type) %>%
+  summarise(avg_range = mean(`Electric Range`, na.rm = TRUE))
+
+ggplot(avg_range_no_tesla,
+       aes(x = EV_Type, y = avg_range, fill = EV_Type)) +
+  geom_col() +
+  scale_fill_manual(values = c("BEV" = "steelblue", "PHEV" = "darkorange")) +
+  labs(
+    title = "Average Electric Range: BEVs vs PHEVs (Tesla Removed)",
+    x = "Vehicle Type",
+    y = "Average Electric Range (miles)"
+  ) +
+  theme_minimal()
+```
+
+![](README_files/figure-gfm/unnamed-chunk-9-3.png)<!-- -->
+
+``` r
+# Show original graphs
+p1
+```
+
+![](README_files/figure-gfm/unnamed-chunk-9-4.png)<!-- -->
+
+``` r
+p2
+```
+
+![](README_files/figure-gfm/unnamed-chunk-9-5.png)<!-- -->
 
 ## Graph Findings
 
